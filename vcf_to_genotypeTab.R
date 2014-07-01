@@ -3,6 +3,8 @@
 #   Author: Tom Poorten, tom.poorten@gmail.com
 ################################################################################################## 
 #   Details:
+#     - input: vcf file (e.g. GATK vcf file)
+#     - output: tab-delimited table with genotypes
 #     - the genotypes dataframe can be used in downstream analyses
 #     - this script is meant to be run in an interactive R session
 #     - genotype format:
