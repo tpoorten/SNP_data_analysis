@@ -11,6 +11,7 @@
 #         0 represents homozygous reference allele
 #         1 represents heterozygous
 #         2 represents homozygous alternative allele
+#  	      NA represents missing data
 
 ## set working directory to the path where vcf file is located
 setwd("~/Dropbox/bioinfo/snps/")
