@@ -22,8 +22,19 @@
 #rm(list=ls())
 
 ## create modified vcf file for read in
-# read in the standard in
-filein = commandArgs()[6]
+# read in the arguments
+
+args <- commandArgs(trailingOnly = TRUE)
+print(args)
+filein = unlist(strsplit(args[grep(pattern="^-i.*vcf$",x=args)], split="-i="))[2]
+meta.arg = unlist(strsplit(args[grep(pattern="^-meta",x=args)], split="-meta="))[2]
+acgt.arg = unlist(strsplit(args[grep(pattern="^-acgt",x=args)], split="-acgt="))[2]
+# set default to TRUE
+meta.arg[is.null(meta.arg)] = "TRUE"
+acgt.arg[is.null(acgt.arg)] = "TRUE"
+
+#filein = args[1]
+filein2 = unlist(strsplit(filein, split='.vcf'))[1]
 #print(filein)
 system(paste("sed 's/^#CHROM/CHROM/' ",filein," > temp.vcfFile.reformat.vcf", sep=""))
 
@@ -37,6 +48,8 @@ vcf.mat = as.matrix(vcf[,c((which(colnames(vcf)=="FORMAT")+1):ncol(vcf))])
 # save for metadata extraction
 vcf.mat.meta = vcf.mat
 #head(vcf.mat)
+# save for acgt extraction
+vcf.acgt2 = vcf.acgt = vcf
 
 ## Convert for .vcf to .tab
 for(col in 1:ncol(vcf.mat)){
@@ -46,31 +59,51 @@ for(col in 1:ncol(vcf.mat)){
   vcf.mat[grep("1/1",vcf.mat[,col]),col] = "2"
   vcf.mat[grep("./.",vcf.mat[,col]),col] = NA
 }
+## write the table with genotypes to a new file - replace the filename as desired
+tab = cbind(chrom.pos, vcf.mat)
+write.table(tab, file=paste(filein2, ".GT.tab",sep=""), sep="\t", quote=F, row.names=F)
 #head(vcf.mat)
 
 ## extract genotype metadata - FORMAT column contains GT:AD:DP:GQ:PL
 #
-allele.depth = read.depth = geno.qual = phred.likel = as.data.frame(vcf.mat.meta)
-for (col in 1:ncol(vcf.mat.meta)) {
-  #print(col)
-  allele.depth[,col] = sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[2])
-  read.depth[,col] = as.numeric(sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[3]))
-  geno.qual[,col] = as.numeric(sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[4]))
-  phred.likel[,col] = sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[5])
+if(grepl("^T",meta.arg))	{
+	allele.depth = read.depth = geno.qual = phred.likel = as.data.frame(vcf.mat.meta)
+	for (col in 1:ncol(vcf.mat.meta)) {
+	  #print(col)
+	  allele.depth[,col] = sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[2])
+	  read.depth[,col] = as.numeric(sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[3]))
+	  geno.qual[,col] = as.numeric(sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[4]))
+	  phred.likel[,col] = sapply(vcf.mat.meta[,col], function(x) unlist(strsplit(x,split=":"))[5])
+	}
+	# add the CHROM AND POS columns
+	allele.depth = cbind(vcf[,1:2], allele.depth)
+	read.depth = cbind(vcf[,1:2], read.depth)
+	geno.qual = cbind(vcf[,1:2], geno.qual)
+	phred.likel = cbind(vcf[,1:2], phred.likel)
+	# write tables
+	write.table(allele.depth, file=paste(filein2, ".AD.tab",sep=""), sep="\t", quote=F, row.names=F)
+	write.table(read.depth, file=paste(filein2, ".DP.tab",sep=""), sep="\t", quote=F, row.names=F)
+	write.table(geno.qual, file=paste(filein2, ".GQ.tab",sep=""), sep="\t", quote=F, row.names=F)
+	write.table(phred.likel, file=paste(filein2, ".PL.tab",sep=""), sep="\t", quote=F, row.names=F)
 }
-allele.depth = cbind(vcf[,1:2], allele.depth)
-read.depth = cbind(vcf[,1:2], read.depth)
-geno.qual = cbind(vcf[,1:2], geno.qual)
-phred.likel = cbind(vcf[,1:2], phred.likel)
 
-## write the table with genotypes to a new file - replace the filename as desired
-tab = cbind(chrom.pos, vcf.mat)
-filein = unlist(strsplit(filein, split='.vcf'))[1]
-write.table(tab, file=paste(filein, ".GT.tab",sep=""), sep="\t", quote=F, row.names=F)
-write.table(allele.depth, file=paste(filein, ".AD.tab",sep=""), sep="\t", quote=F, row.names=F)
-write.table(read.depth, file=paste(filein, ".DP.tab",sep=""), sep="\t", quote=F, row.names=F)
-write.table(geno.qual, file=paste(filein, ".GQ.tab",sep=""), sep="\t", quote=F, row.names=F)
-write.table(phred.likel, file=paste(filein, ".PL.tab",sep=""), sep="\t", quote=F, row.names=F)
+## extract the ACGT genotypes
+if(grepl("^T",acgt.arg)){
+	vcf.acgt = as.matrix(vcf.acgt[,c((which(colnames(vcf.acgt)=="FORMAT")+1):ncol(vcf.acgt))])
+	for(row in 1:nrow(vcf.acgt)) {
+	  #print(row)
+	  gt = sapply(vcf.acgt[row,], function(x) unlist(strsplit(x, split=":"))[1])
+	  vcf.acgt[row, which(gt  ==  "0/0") ] = paste(vcf.acgt2$REF[row], vcf.acgt2$REF[row], sep="/")
+	  vcf.acgt[row, which(gt  ==  "0/1") ] = paste(vcf.acgt2$REF[row], vcf.acgt2$ALT[row], sep="/")
+	  vcf.acgt[row, which(gt  ==  "1/1") ] = paste(vcf.acgt2$ALT[row], vcf.acgt2$ALT[row], sep="/")
+	  vcf.acgt[row, which(gt  ==  "./.") ] = NA
+	}
+	# add the CHROM AND POS columns
+	vcf.acgt = cbind(vcf[,1:2], vcf.acgt)
+	# write table
+	write.table(vcf.acgt,file=paste(filein2, ".ACGT.tab",sep=""),sep="\t",quote=F,row.names=F)
+}
+
 # check that this file can be read in correctly
 #tab2 = read.table("snps_5strains.select.GT.tab", sep="\t", header=T, stringsAsFactors=F)
 # clean up the temp file
