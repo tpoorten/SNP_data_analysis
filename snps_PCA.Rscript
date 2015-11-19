@@ -34,9 +34,6 @@ print("Dataset dimensions: ")
 dim(snp)
 print("These are the first 6 lines of the dataset:")
 head(snp); 
-# output the genotype table by individual
-print("Genotype tables by individual:")
-as.list(apply(snp[,-c(1,2)], 2, function(x) table((x))) )
 
 ## prep SNP table for PCA
 snp.t = t(snp[,3:ncol(snp)])
