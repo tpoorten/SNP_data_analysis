@@ -1,6 +1,6 @@
 SNP_data_analysis
 =================
-Convert vcf file to table format
+Convert vcf file to table format with script: 'vcf_to_genotypeTab_meta.Rscript'
  - usage example: ./vcf_to_genotypeTab_meta.Rscript -i=test.vcf 
  - input: vcf file (e.g. GATK vcf file)
 		- optional arguments: 
@@ -19,7 +19,7 @@ Convert vcf file to table format
 	  NA represents missing data
 
 
-PCA plot
+PCA plot with script: 'snps_PCA.Rscript'
  - purpose - Make Principal Components Analysis (PCA) plot from SNP genotypes
  - usage example: ./snps_PCA.Rscript -i=test.GT.tab  OR  ./snps_PCA.Rscript test.GT.tab
  - input: GT table where genotypes are coded 0,1,2, ...
