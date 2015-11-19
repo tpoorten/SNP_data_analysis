@@ -4,11 +4,11 @@
 #   Author: Tom Poorten, tom.poorten@gmail.com
 ################################################################################################## 
 #   Details:
+#	  - usage example: ./snps_PCA example.GT.tab  OR  ./snps_PCA -i=example.GT.tab
 #     - input: GT table where genotypes are coded 0,1,2, ...
 #     - output: PCA plot
 #
 #	  - this script is meant to be run as an executable Rscript
-#	  - run on command line: ./snps_PCA example.GT.tab  OR  ./snps_PCA -i=example.GT.tab
 #
 #     - *WARNING*: sites with missing data are EXCLUDED in this analysis
 #     - prcomp() is used for PCA
