@@ -4,7 +4,7 @@
 #   Author: Tom Poorten, tom.poorten@gmail.com
 ################################################################################################## 
 #   Details:
-#	  - usage example: ./snps_PCA.Rscript -i=test.GT.tab  OR  ./snps_PCA.Rscript test.GT.tab
+#	  - usage example: ./snps_PCA.Rscript -i=testSNPs.GT.tab  OR  ./snps_PCA.Rscript testSNPs.GT.tab
 #     - input: GT table where genotypes are coded 0,1,2, ...
 #     - output: PCA plot
 #

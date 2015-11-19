@@ -4,7 +4,7 @@
 #   Author: Tom Poorten, tom.poorten@gmail.com
 ################################################################################################## 
 #   Details:
-#	  - usage example: ./vcf_to_genotypeTab_meta.Rscript -i=test.vcf 
+#	  - usage example: ./vcf_to_genotypeTab_meta.Rscript -i=testSNPs.vcf 
 #     - input: vcf file (e.g. GATK vcf file)
 #			- optional arguments: 
 #					'-acgt' : include this flag to output nucleotide genotypes  (default: on)	
