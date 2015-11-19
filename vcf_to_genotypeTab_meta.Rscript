@@ -4,7 +4,11 @@
 #   Author: Tom Poorten, tom.poorten@gmail.com
 ################################################################################################## 
 #   Details:
+#	  - usage example: ./vcf_to_genotypeTab_meta.Rscript -i=test.vcf 
 #     - input: vcf file (e.g. GATK vcf file)
+#			- optional arguments: 
+#					'-acgt' : include this flag to output nucleotide genotypes  (default: on)	
+#					'-meta' : include this flag to output metadata tables (default: on)	
 #     - output: tab-delimited table with genotypes
 #				AND tab-delimited tables with genotype metadata:
 #					AD: allele depth		DP: read depth
